@@ -1,1 +1,1 @@
-# simulation4lazypeople
+# simulation4lazythinkers

@@ -1,0 +1,78 @@
+---
+title: "Monty hall problem"
+author: "Jae Yeon Kim"
+date: "11/7/2020"
+---
+
+# Setup 
+
+```{r}
+if (!require(pacman)) install.packages("pacman")
+
+p_load(tidyverse, 
+       purrr, 
+       patchwork)
+```
+
+# Define monty hall problem 
+
+`classic_monty()` function comes from Rory Winston's blogpost. For convenience, I changed the output data format to dataframe. 
+
+```{r}
+
+classic_monty <- function() {
+  # Assign the prize
+  prize <- sample(1:3,1)
+  # You pick a door
+  choice <- sample(1:3,1)
+  # Monty picks a door
+  monty <- sample(c(1:3)[-c(choice, prize)], 1)
+
+  data.frame(outcome = if_else(prize != choice, "Switch", "Stick"))
+  
+}
+```
+
+# Run simulation 
+
+Run simulation once. 
+
+```{r}
+rerun(100, classic_monty()) %>%
+   reduce(bind_rows) %>%
+   add_rownames() %>%
+   count(outcome) %>%
+   mutate(freq = round(n/100, 2))
+```
+
+Run simulation many times while varying k (sample size). 
+
+```{r}
+
+monty_sim <- function(k){
+ 
+   rerun(k, classic_monty()) %>%
+      reduce(bind_rows) %>%
+      add_rownames() %>%
+      count(outcome) %>%
+      mutate(freq = round(n/k,2),
+             sample_size = k)
+
+}
+
+sim_res <- map(c(1:200), monty_sim) %>%
+   reduce(bind_rows)
+
+sim_res %>%
+   filter(outcome == "Switch") %>%
+   ggplot(aes(x = sample_size, y = freq)) +
+      geom_point() +
+      geom_smooth() +
+      theme_classic() +
+      labs(x = "Sample size", 
+           y = "Frequency")
+```
+
+
+
+

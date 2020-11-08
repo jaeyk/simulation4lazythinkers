@@ -1,0 +1,76 @@
+---
+title: "Central Limit Theorem"
+author: "Jae Yeon Kim"
+date: "11/7/2020"
+---
+
+# Setup 
+
+```{r}
+if (!require(pacman)) install.packages("pacman")
+
+p_load(tidyverse, 
+       purrr, 
+       patchwork)
+```
+# Simulating central limit theorem 
+
+## True distribution 
+
+This is how the sample data distribution looks like. 
+
+```{r}
+
+# For reproducibility 
+set.seed(1107) 
+
+n <- 1000 ; mu <- 500 ; sigma <- 100 
+
+# Normal distribution 
+y <- rnorm(n = 1000, mean = mu, sd = sigma)
+
+```
+
+## Simulated distribution 
+
+Let's create smaller samples of this sample distribution using simulation. 
+
+### Base R approach 
+
+```{r}
+
+small_n <- 100 ; k <- 1000
+
+y_list <- rep(list(NA), k)
+
+for (i in seq(k)) {
+        
+    y_list[[i]] <- rnorm(small_n, mu, sigma)
+        
+}
+
+y_means <- lapply(y_list, mean) %>% unlist()
+
+# Visualize 
+(qplot(y) +
+   geom_vline(xintercept = 500, linetype = "dotted", color = "red")) +
+(qplot(y_means) +
+   geom_vline(xintercept = 500, linetype = "dotted", color = "red"))
+
+```
+### Tidy approach 
+
+```{r}
+small_n <- 100 ; k <- 1000
+
+y_tidy <- rerun(k, rnorm(small_n, mu, sigma)) 
+
+y_means_tidy <- map_dbl(y_tidy, mean)
+
+# Visualize 
+(qplot(y) +
+   geom_vline(xintercept = 500, linetype = "dotted", color = "red")) +
+(qplot(y_means_tidy) +
+   geom_vline(xintercept = 500, linetype = "dotted", color = "red"))
+```
+

@@ -1,0 +1,77 @@
+---
+title: "Monte carlo simulation"
+author: "Jae Yeon Kim"
+date: "11/8/2020"
+---
+
+# Setup 
+
+```{r}
+if (!require(pacman)) install.packages("pacman")
+
+p_load(tidyverse, 
+       purrr, 
+       patchwork)
+```
+
+# Define a circle 
+
+```{r}
+
+calculate_diff <- function(){
+        
+# Sample x, y from uniform distribution
+x <- runif(1000, -0.5, 0.5) # 
+
+y <- runif(1000, -0.5, 0.5)
+
+in_circle <- x^2 + y^2 <= 0.5^2
+
+mc_pi <- (sum(in_circle)/n_sims)*(2*2)
+
+data.frame("mc_pi" = mc_pi,
+           "diff" = abs(mc_pi - base::pi))
+
+}
+
+```
+
+# Run simulation 
+
+Run simulation once. 
+
+```{r}
+rerun(100, calculate_diff()) %>%
+   reduce(bind_rows) %>%
+   summarise(mean_mc_pi = mean(mc_pi),
+             mean_diff = mean(diff))
+```
+
+Run simulation many times while varying k (# of simulations). 
+
+```{r}
+pi_sim <- function(k){
+ 
+rerun(k, calculate_diff()) %>%
+   reduce(bind_rows) %>%
+   summarise(mean_mc_pi = mean(mc_pi),
+             mean_diff = mean(diff)) %>%
+   mutate(sim_n = k)
+
+}
+
+sim_res <- map(c(1:100), pi_sim) %>%
+   reduce(bind_rows)
+
+sim_res %>%
+   ggplot(aes(x = sim_n, y = mean_diff)) +
+      geom_point() +
+      geom_smooth() +
+      theme_classic() +
+      labs(x = "N of simulations", 
+           y = "Mean difference")
+```
+
+
+
+

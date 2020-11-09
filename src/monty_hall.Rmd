@@ -45,7 +45,7 @@ rerun(100, classic_monty()) %>%
    mutate(freq = round(n/100, 2))
 ```
 
-Run simulation many times while varying k (sample size). 
+Run simulation many times while varying k (# of simulations). 
 
 ```{r}
 
@@ -56,7 +56,7 @@ monty_sim <- function(k){
       add_rownames() %>%
       count(outcome) %>%
       mutate(freq = round(n/k,2),
-             sample_size = k)
+             sim_n = k)
 
 }
 
@@ -65,11 +65,11 @@ sim_res <- map(c(1:200), monty_sim) %>%
 
 sim_res %>%
    filter(outcome == "Switch") %>%
-   ggplot(aes(x = sample_size, y = freq)) +
+   ggplot(aes(x = sim_n, y = freq)) +
       geom_point() +
       geom_smooth() +
       theme_classic() +
-      labs(x = "Sample size", 
+      labs(x = "N of simulations", 
            y = "Frequency")
 ```
 

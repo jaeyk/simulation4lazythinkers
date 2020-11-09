@@ -16,6 +16,8 @@ p_load(tidyverse,
 
 # Define a circle 
 
+The example draws on [Will Kurt's blog post](https://www.countbayesie.com/blog/2020/8/16/why-bayesian-stats-need-monte-carlo-methods).
+
 ```{r}
 
 calculate_diff <- function(){
